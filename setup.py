@@ -8,4 +8,7 @@ setup(name='sleepyq',
       author_email='josh@technicalpickles.com',
       license='MIT',
       packages=['sleepyq'],
+      install_requires=[
+          'requests'
+      ],
       zip_safe=False)
