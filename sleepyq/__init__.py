@@ -18,14 +18,14 @@ class Sleepyq:
     def sleepers(self):
         url = 'https://api.sleepiq.sleepnumber.com/rest/sleeper'
         r = self._session.get(url)
-        return r.json()
+        return r.json()['sleepers']
 
     def beds(self):
         url = 'https://api.sleepiq.sleepnumber.com/rest/bed'
         r = self._session.get(url)
-        return r.json()
+        return r.json()['beds']
 
     def bed_family_status(self):
         url = 'https://api.sleepiq.sleepnumber.com/rest/bed/familyStatus'
         r = self._session.get(url)
-        return r.json()
+        return r.json()['beds']
