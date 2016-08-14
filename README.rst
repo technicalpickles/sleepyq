@@ -14,7 +14,7 @@ To get started using the library, here's the full usage:
 
     >>> from sleepyq import Sleepyq
     >>> from pprint import pprint
-    
+    >>>
     >>> client = Sleepyq('your-login', 'your-password')
     >>> client.login()
     >>> pprint(client.sleepers())
