@@ -2,9 +2,9 @@
 Sleepyq
 ==========
 
-Sleepyq is an library for accessing the SleepIQ API from Python. `SleepIQ <http://www.sleepnumber.com/sn/en/sleepiq-sleep-tracker>`__. is an addon for `SleepNumber beds <http://www.sleepnumber.com/>`__.
+Sleepyq is an library for accessing the SleepIQ API from Python. `SleepIQ <http://www.sleepnumber.com/sn/en/sleepiq-sleep-tracker>`__ is an addon for `SleepNumber beds <http://www.sleepnumber.com/>`__.
 
-To install
+To install:
 
 .. code:: bash
 
