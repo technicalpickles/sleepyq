@@ -1,4 +1,5 @@
 import requests
+from IPython import embed
 
 class Sleepyq:
     def __init__(self, login, password):
@@ -12,20 +13,26 @@ class Sleepyq:
 
         data = {'login': self._login, 'password': self._password}
         r = self._session.put('https://api.sleepiq.sleepnumber.com/rest/login', json=data)
+        r.raise_for_status()
 
         self._session.params['_k'] = r.json()['key']
+
+        return True
 
     def sleepers(self):
         url = 'https://api.sleepiq.sleepnumber.com/rest/sleeper'
         r = self._session.get(url)
+        r.raise_for_status()
         return r.json()['sleepers']
 
     def beds(self):
         url = 'https://api.sleepiq.sleepnumber.com/rest/bed'
         r = self._session.get(url)
+        r.raise_for_status()
         return r.json()['beds']
 
     def bed_family_status(self):
         url = 'https://api.sleepiq.sleepnumber.com/rest/bed/familyStatus'
         r = self._session.get(url)
+        r.raise_for_status()
         return r.json()['beds']
