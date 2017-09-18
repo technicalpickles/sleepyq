@@ -19,7 +19,7 @@ To get started using the library, here's the full usage:
     >>> client.login()
     >>> pprint(client.sleepers())
     >>> pprint(client.beds())
-    >>> pprint(bed_family_status())
+    >>> pprint(client.bed_family_status())
 
 The API is undocumented, so this library does not make much attempt to structure the data from the API into objects.
 
