@@ -91,7 +91,6 @@ class Sleepyq:
                 setattr(bed, side, status)
         return beds
 
-
     def bed_family_status(self):
         url = 'https://api.sleepiq.sleepnumber.com/rest/bed/familyStatus'
         r = self._session.get(url)
@@ -99,3 +98,48 @@ class Sleepyq:
 
         statuses = [FamilyStatus(status) for status in r.json()['beds']]
         return statuses
+
+    def set_lights(self, bednum, light, setting):
+        #
+        # light 1-4
+        # setting 0=off, 1=on
+        #
+        url = 'https://api.sleepiq.sleepnumber.com/rest/bed/'+self.beds()[bednum].data['bedId']+'/foundation/outlet'
+        data = {'outletId': light, 'setting': setting}
+        r = self._session.put(url, json=data)
+        r.raise_for_status()
+
+        return True
+
+    def preset(self, bednum, preset, side, speed):
+        #
+        # preset 1-6
+        ### 1=fav?
+        ### 2=read
+        ### 3=watch tv
+        ### 4=flat
+        ### 5=zero g
+        ### 6=snore
+        # side "R" or "L"
+        # Speed 0=fast, 1=slow
+        #
+        url = 'https://api.sleepiq.sleepnumber.com/rest/bed/'+self.beds()[bednum].data['bedId']+'/foundation/preset'
+        data = {'preset':preset,'side':side,'speed':speed}
+        r = self._session.put(url, json=data)
+        r.raise_for_status()
+
+        return True
+
+    def set_sleepnumber(self, bednum, side, setting):
+        #
+        # side "R" or "L"
+        # setting 0-100 (increments of 5)
+        #
+        url = 'https://api.sleepiq.sleepnumber.com/rest/bed/'+self.beds()[bednum].data['bedId']+'/sleepNumber'
+        data = {'bed': self.beds()[bednum].data['bedId'], 'side': side, "sleepNumber":setting}
+        self._session.params['side']=side
+        r = self._session.put(url, json=data)
+        r.raise_for_status()
+        del self._session.params['side']
+
+        return True
