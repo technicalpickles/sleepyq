@@ -48,7 +48,8 @@ class Sleepyq:
 
         data = {'login': self._login, 'password': self._password}
         r = self._session.put('https://api.sleepiq.sleepnumber.com/rest/login', json=data)
-        r.raise_for_status()
+        if r.status_code == 401:
+            return False
 
         self._session.params['_k'] = r.json()['key']
 
@@ -57,7 +58,10 @@ class Sleepyq:
     def sleepers(self):
         url = 'https://api.sleepiq.sleepnumber.com/rest/sleeper'
         r = self._session.get(url)
-        r.raise_for_status()
+        if r.status_code == 401:
+            self.login()
+            r = self._session.get(url)
+            r.raise_for_status()
 
         sleepers = [Sleeper(sleeper) for sleeper in r.json()['sleepers']]
         return sleepers
@@ -65,7 +69,11 @@ class Sleepyq:
     def beds(self):
         url = 'https://api.sleepiq.sleepnumber.com/rest/bed'
         r = self._session.get(url)
-        r.raise_for_status()
+        if r.status_code == 401:
+            self.login()
+            r = self._session.get(url)
+            r.raise_for_status()
+
         beds = [Bed(bed) for bed in r.json()['beds']]
         return beds
 
@@ -94,7 +102,10 @@ class Sleepyq:
     def bed_family_status(self):
         url = 'https://api.sleepiq.sleepnumber.com/rest/bed/familyStatus'
         r = self._session.get(url)
-        r.raise_for_status()
+        if r.status_code == 401:
+            self.login()
+            r = self._session.get(url)
+            r.raise_for_status()
 
         statuses = [FamilyStatus(status) for status in r.json()['beds']]
         return statuses
@@ -107,7 +118,10 @@ class Sleepyq:
         url = 'https://api.sleepiq.sleepnumber.com/rest/bed/'+self.beds()[bednum].data['bedId']+'/foundation/outlet'
         data = {'outletId': light, 'setting': setting}
         r = self._session.put(url, json=data)
-        r.raise_for_status()
+        if r.status_code == 401:
+            self.login()
+            r = self._session.put(url, json=data)
+            r.raise_for_status()
 
         return True
 
@@ -126,7 +140,10 @@ class Sleepyq:
         url = 'https://api.sleepiq.sleepnumber.com/rest/bed/'+self.beds()[bednum].data['bedId']+'/foundation/preset'
         data = {'preset':preset,'side':side,'speed':speed}
         r = self._session.put(url, json=data)
-        r.raise_for_status()
+        if r.status_code == 401:
+            self.login()
+            r = self._session.put(url, json=data)
+            r.raise_for_status()
 
         return True
 
@@ -139,7 +156,12 @@ class Sleepyq:
         data = {'bed': self.beds()[bednum].data['bedId'], 'side': side, "sleepNumber":setting}
         self._session.params['side']=side
         r = self._session.put(url, json=data)
-        r.raise_for_status()
+        if r.status_code == 401:
+            self.login()
+            r = self._session.put(url, json=data)
+            r.raise_for_status()
+
         del self._session.params['side']
 
         return True
+
