@@ -20,6 +20,9 @@ To get started using the library, here's the full usage:
     >>> pprint(client.sleepers())
     >>> pprint(client.beds())
     >>> pprint(client.bed_family_status())
+    >>> client.set_lights(bedNumber, lightNumber, 1)
+    >>> client.preset(self, bedNumber, preset, side, speed)
+    >>> client.set_sleepnumber(bedNumber, side, sleepnumber)
 
 The API is undocumented, so this library does not make much attempt to structure the data from the API into objects.
 
