@@ -61,6 +61,7 @@ class Sleepyq:
         if r.status_code == 401:
             self.login()
             r = self._session.get(url)
+        if r.status_code != 200:
             r.raise_for_status()
 
         sleepers = [Sleeper(sleeper) for sleeper in r.json()['sleepers']]
@@ -72,6 +73,7 @@ class Sleepyq:
         if r.status_code == 401:
             self.login()
             r = self._session.get(url)
+        if r.status_code != 200:
             r.raise_for_status()
 
         beds = [Bed(bed) for bed in r.json()['beds']]
@@ -87,10 +89,14 @@ class Sleepyq:
 
         for bed in beds:
             family_status = bed_family_statuses_by_bed_id[bed.bed_id]
+            print(bed)
 
             for side in ['left', 'right']:
                 sleeper_key = 'sleeper_' + side + '_id'
                 sleeper_id = getattr(bed, sleeper_key)
+                if sleeper_id == "0":
+                    continue
+                print(sleeper_id)
                 sleeper = sleepers_by_id[sleeper_id]
 
                 status = getattr(family_status, side)
@@ -105,6 +111,7 @@ class Sleepyq:
         if r.status_code == 401:
             self.login()
             r = self._session.get(url)
+        if r.status_code != 200:
             r.raise_for_status()
 
         statuses = [FamilyStatus(status) for status in r.json()['beds']]
@@ -121,9 +128,25 @@ class Sleepyq:
         if r.status_code == 401:
             self.login()
             r = self._session.put(url, json=data)
+        if r.status_code != 200:
             r.raise_for_status()
 
         return True
+
+#    def get_lights(self, bednum, light):
+#        url = 'https://api.sleepiq.sleepnumber.com/rest/bed/'+self.beds()[bednum].data['bedId']+'/foundation/outlet'
+#        self._session.params['outletId'] = light
+#        r = self._session.get(url)
+#        if r.status_code == 401:
+#            self.login()
+#            r = self._session.get(url)
+#        if r.status_code != 200:
+#            r.raise_for_status()
+#
+#        del self._session.params['outletId']
+#
+#        #beds = [Bed(bed) for bed in r.json()['beds']]
+#        return r.json()#beds
 
     def preset(self, bednum, preset, side, speed):
         #
@@ -143,6 +166,7 @@ class Sleepyq:
         if r.status_code == 401:
             self.login()
             r = self._session.put(url, json=data)
+        if r.status_code != 200:
             r.raise_for_status()
 
         return True
@@ -159,9 +183,26 @@ class Sleepyq:
         if r.status_code == 401:
             self.login()
             r = self._session.put(url, json=data)
+        if r.status_code != 200:
             r.raise_for_status()
 
         del self._session.params['side']
 
         return True
+
+#    def motion(self, bednum, side, foot, head, massage):
+#        #
+#        # side "R" or "L"
+#        # 
+#        #
+#        url = 'https://api.sleepiq.sleepnumber.com/rest/bed/'+self.beds()[bednum].data['bedId']+'/foundation/motion'
+#        data = {"footMotion":foot, "headMotion":head, "massageMotion":massage, "side":side}
+#        r = self._session.put(url, json=data)
+#        if r.status_code == 401:
+#            self.login()
+#            r = self._session.put(url, json=data)
+#        if r.status_code != 200:
+#            r.raise_for_status()
+#
+#        return True
 
