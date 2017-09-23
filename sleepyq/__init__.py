@@ -44,7 +44,7 @@ class Sleepyq:
         self._api = "https://api.sleepiq.sleepnumber.com/rest"
 
 
-    def makeRequest(self, url, mode="get", data=""):
+    def __makeRequest(self, url, mode="get", data=""):
         if mode == 'put':
             r = self._session.put(url, json=data)
         else:
@@ -59,6 +59,7 @@ class Sleepyq:
             r.raise_for_status()
 
         return r
+
 
     def login(self):
         if '_k' in self._session.params:
@@ -76,7 +77,7 @@ class Sleepyq:
 
     def sleepers(self):
         url = self._api+'/sleeper'
-        r=self.makeRequest(url)
+        r=self.__makeRequest(url)
 
         sleepers = [Sleeper(sleeper) for sleeper in r.json()['sleepers']]
         return sleepers
@@ -84,7 +85,7 @@ class Sleepyq:
 
     def beds(self):
         url = self._api+'/bed'
-        r=self.makeRequest(url)
+        r=self.__makeRequest(url)
 
         beds = [Bed(bed) for bed in r.json()['beds']]
         return beds
@@ -117,7 +118,7 @@ class Sleepyq:
 
     def bed_family_status(self):
         url = self._api+'/bed/familyStatus'
-        r=self.makeRequest(url)
+        r=self.__makeRequest(url)
 
         statuses = [FamilyStatus(status) for status in r.json()['beds']]
         return statuses
@@ -130,20 +131,20 @@ class Sleepyq:
         #
         url = self._api+'/bed/'+self.beds()[bednum].data['bedId']+'/foundation/outlet'
         data = {'outletId': light, 'setting': setting}
-        r=self.makeRequest(url, "put", data)
+        r=self.__makeRequest(url, "put", data)
 
         return True
 
+# Fix
+    def get_lights(self, bednum, light):
+        url = self._api+'/bed/'+self.beds()[bednum].data['bedId']+'/foundation/outlet'
+        self._session.params['outletId'] = light
+        r=self.__makeRequest(url)
 
-#    def get_lights(self, bednum, light):
-#        url = self._api+'/bed/'+self.beds()[bednum].data['bedId']+'/foundation/outlet'
-#        self._session.params['outletId'] = light
-#        r=self.makeRequest(url)
-#
-#        del self._session.params['outletId']
-#
-#        #beds = [Bed(bed) for bed in r.json()['beds']]
-#        return r.json()#beds
+        del self._session.params['outletId']
+
+        #beds = [Bed(bed) for bed in r.json()['beds']]
+        return r.json()#beds
 
 
     def preset(self, bednum, preset, side, speed):
@@ -160,7 +161,7 @@ class Sleepyq:
         #
         url = self._api+'/bed/'+self.beds()[bednum].data['bedId']+'/foundation/preset'
         data = {'preset':preset,'side':side,'speed':speed}
-        r=self.makeRequest(url, "put", data)
+        r=self.__makeRequest(url, "put", data)
 
         return True
 
@@ -173,7 +174,7 @@ class Sleepyq:
         url = self._api+'/bed/'+self.beds()[bednum].data['bedId']+'/sleepNumber'
         data = {'bed': self.beds()[bednum].data['bedId'], 'side': side, "sleepNumber":setting}
         self._session.params['side']=side
-        r=self.makeRequest(url, "put", data)
+        r=self.__makeRequest(url, "put", data)
 
         del self._session.params['side']
 
@@ -187,27 +188,33 @@ class Sleepyq:
         #
         url = self._api+'/bed/'+self.beds()[bednum].data['bedId']+'/sleepNumberFavorite'
         data = {'side': side, "sleepNumberFavorite":setting}
-        r=self.makeRequest(url, "put", data)
+        r=self.__makeRequest(url, "put", data)
 
         return True
 
+#Fix
+    def get_favsleepnumber(self, bednum):
+        url = self._api+'/bed/'+self.beds()[bednum].data['bedId']+'/sleepNumberFavorite'
+        r=self.__makeRequest(url)
 
-#    def get_favsleepnumber(self, bednum):
-#        url = self._api+'/bed/'+self.beds()[bednum].data['bedId']+'/sleepNumberFavorite'
-#        r=self.makeRequest(url)
-#
-#        #beds = [Bed(bed) for bed in r.json()['beds']]
-#        return r.json()
+        #beds = [Bed(bed) for bed in r.json()['beds']]
+        return r.json()
 
 
-#    def motion(self, bednum, side, foot, head, massage):
-#        #
-#        # side "R" or "L"
-#        # 
-#        #
-#        url = self._api+'/bed/'+self.beds()[bednum].data['bedId']+'/foundation/motion'
-#        data = {"footMotion":foot, "headMotion":head, "massageMotion":massage, "side":side}
-#        r=self.makeRequest(url, "put", data)
-#
-#        return True
+    def stopmotion(self, bednum, side):
+        #
+        # side "R" or "L"
+        #
+        url = self._api+'/bed/'+self.beds()[bednum].data['bedId']+'/foundation/motion'
+        data = {"footMotion":1, "headMotion":1, "massageMotion":1, "side":side}
+        r=self.__makeRequest(url, "put", data)
+
+        return True
+
+    def stoppump(self, bednum):
+        url = self._api+'/bed/'+self.beds()[bednum].data['bedId']+'/pump/forceIdle'
+        r=self.__makeRequest(url, "put")
+
+        return True
+
 
