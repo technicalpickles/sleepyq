@@ -36,6 +36,19 @@ class Sleeper(APIobject):
         super(Sleeper, self).__init__(data)
         self.bed = None
 
+class Light(APIobject):
+    def __init__(self, data):
+        super(Light, self).__init__(data)
+        self.bed = None
+
+class FavSleepNumber(APIobject):
+    def __init__(self, data):
+        super(FavSleepNumber, self).__init__(data)
+        self.bed = None
+        self.left = None
+        self.right = None
+
+
 class Sleepyq:
     def __init__(self, login, password):
         self._login = login
@@ -139,7 +152,6 @@ class Sleepyq:
 
         return True
 
-# Fix
     def get_light(self, bedId, light):
         url = self._api+'/bed/'+bedId+'/foundation/outlet'
         self._session.params['outletId'] = light
@@ -147,8 +159,8 @@ class Sleepyq:
 
         del self._session.params['outletId']
 
-        #beds = [Bed(bed) for bed in r.json()['beds']]
-        return r.json()#beds
+        light = Light(r.json())
+        return light
 
 
     def preset(self, bedId, preset, side, speed):
@@ -196,13 +208,12 @@ class Sleepyq:
 
         return True
 
-#Fix
     def get_favsleepnumber(self, bedId):
         url = self._api+'/bed/'+bedId+'/sleepNumberFavorite'
         r=self.__makeRequest(url)
 
-        #beds = [Bed(bed) for bed in r.json()['beds']]
-        return r.json()
+        favsleepnumber = FavSleepNumber(r.json())
+        return favsleepnumber
 
 
     def stopmotion(self, bedId, side):
