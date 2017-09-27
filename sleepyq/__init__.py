@@ -59,15 +59,15 @@ class Sleepyq:
 
     def __makeRequest(self, url, mode="get", data=""):
         if mode == 'put':
-            r = self._session.put(url, json=data)
+            r = self._session.put(self._api+url, json=data)
         else:
-            r = self._session.get(url)
+            r = self._session.get(self._api+url)
         if r.status_code == 401:
             self.login()
             if mode == 'put':
-                r = self._session.put(url, json=data)
+                r = self._session.put(self._api+url, json=data)
             else:
-                r = self._session.get(url)
+                r = self._session.get(self._api+url)
         if r.status_code != 200:
             r.raise_for_status()
 
@@ -89,7 +89,7 @@ class Sleepyq:
 
 
     def sleepers(self):
-        url = self._api+'/sleeper'
+        url = '/sleeper'
         r=self.__makeRequest(url)
 
         sleepers = [Sleeper(sleeper) for sleeper in r.json()['sleepers']]
@@ -97,7 +97,7 @@ class Sleepyq:
 
 
     def beds(self):
-        url = self._api+'/bed'
+        url = '/bed'
         r=self.__makeRequest(url)
 
         beds = [Bed(bed) for bed in r.json()['beds']]
@@ -130,7 +130,7 @@ class Sleepyq:
 
 
     def bed_family_status(self):
-        url = self._api+'/bed/familyStatus'
+        url = '/bed/familyStatus'
         r=self.__makeRequest(url)
 
         statuses = [FamilyStatus(status) for status in r.json()['beds']]
@@ -146,14 +146,14 @@ class Sleepyq:
         ### 4=Left Night Light
         # setting 0=off, 1=on
         #
-        url = self._api+'/bed/'+bedId+'/foundation/outlet'
+        url = '/bed/'+bedId+'/foundation/outlet'
         data = {'outletId': light, 'setting': setting}
         r=self.__makeRequest(url, "put", data)
 
         return True
 
     def get_light(self, bedId, light):
-        url = self._api+'/bed/'+bedId+'/foundation/outlet'
+        url = '/bed/'+bedId+'/foundation/outlet'
         self._session.params['outletId'] = light
         r=self.__makeRequest(url)
 
@@ -175,7 +175,7 @@ class Sleepyq:
         # side "R" or "L"
         # Speed 0=fast, 1=slow
         #
-        url = self._api+'/bed/'+bedId+'/foundation/preset'
+        url = '/bed/'+bedId+'/foundation/preset'
         data = {'preset':preset,'side':side,'speed':speed}
         r=self.__makeRequest(url, "put", data)
 
@@ -187,7 +187,7 @@ class Sleepyq:
         # side "R" or "L"
         # setting 0-100 (increments of 5)
         #
-        url = self._api+'/bed/'+bedId+'/sleepNumber'
+        url = '/bed/'+bedId+'/sleepNumber'
         data = {'bed': bedId, 'side': side, "sleepNumber":setting}
         self._session.params['side']=side
         r=self.__makeRequest(url, "put", data)
@@ -202,14 +202,14 @@ class Sleepyq:
         # side "R" or "L"
         # setting 0-100 (increments of 5)
         #
-        url = self._api+'/bed/'+bedId+'/sleepNumberFavorite'
+        url = '/bed/'+bedId+'/sleepNumberFavorite'
         data = {'side': side, "sleepNumberFavorite":setting}
         r=self.__makeRequest(url, "put", data)
 
         return True
 
     def get_favsleepnumber(self, bedId):
-        url = self._api+'/bed/'+bedId+'/sleepNumberFavorite'
+        url = '/bed/'+bedId+'/sleepNumberFavorite'
         r=self.__makeRequest(url)
 
         favsleepnumber = FavSleepNumber(r.json())
@@ -220,14 +220,14 @@ class Sleepyq:
         #
         # side "R" or "L"
         #
-        url = self._api+'/bed/'+bedId+'/foundation/motion'
+        url = '/bed/'+bedId+'/foundation/motion'
         data = {"footMotion":1, "headMotion":1, "massageMotion":1, "side":side}
         r=self.__makeRequest(url, "put", data)
 
         return True
 
     def stoppump(self, bedId):
-        url = self._api+'/bed/'+bedId+'/pump/forceIdle'
+        url = '/bed/'+bedId+'/pump/forceIdle'
         r=self.__makeRequest(url, "put")
 
         return True
