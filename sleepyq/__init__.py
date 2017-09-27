@@ -60,13 +60,16 @@ class Sleepyq:
             r = self._session.put(self._api+url, json=data)
         else:
             r = self._session.get(self._api+url)
-        if r.status_code == 401:
+        if r.status_code == 401: # HTTP error 401 Unauthorized
+            # Login
             self.login()
+            # Retry Request
             if mode == 'put':
                 r = self._session.put(self._api+url, json=data)
             else:
                 r = self._session.get(self._api+url)
-        if r.status_code != 200:
+        if r.status_code != 200: # If status code is not 200 OK
+            # Raise error
             r.raise_for_status()
         return r
 
@@ -133,6 +136,9 @@ class Sleepyq:
         return True
 
     def get_light(self, bedId, light):
+        #
+        # same light numbering as set_light
+        #
         url = '/bed/'+bedId+'/foundation/outlet'
         self._session.params['outletId'] = light
         r=self.__makeRequest(url)
@@ -184,7 +190,6 @@ class Sleepyq:
         r=self.__makeRequest(url)
         favsleepnumber = FavSleepNumber(r.json())
         return favsleepnumber
-
 
     def stopmotion(self, bedId, side):
         #
