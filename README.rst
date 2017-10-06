@@ -20,7 +20,7 @@ To get started using the library, here's the full usage:
     >>> pprint(client.sleepers())
     >>> pprint(client.beds())
     >>> pprint(client.bed_family_status())
-    >>> client.set_lights(bedNumber, lightNumber, 1)
+    >>> client.set_lights(bedNumber, lightNumber, setting)
     >>> pprint(client.get_lights(bedNumber, lightNumber))
     >>> client.preset(bedNumber, preset, side, speed)
     >>> client.set_sleepnumber(bedNumber, side, sleepnumber)
@@ -39,7 +39,5 @@ The first request to happen is to login. This returns a key (_k) that needs to b
 Todo
 -----
 
-- This is my first python thing, so there are probably plenty of improvements
 - Error check response for non-200 code, or errors returned as JSON
-- Testing?
 - Explore API more. There are a few more API calls out there, like updating profile, modifying sleep for previous night, but they seem less immediately useful for automation.
