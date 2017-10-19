@@ -55,7 +55,7 @@ class Sleepyq:
         self._session = requests.Session()
         self._api = "https://api.sleepiq.sleepnumber.com/rest"
 
-    def __makeRequest(self, url, mode="get", data=""):
+    def __make_request(self, url, mode="get", data=""):
         if mode == 'put':
             r = self._session.put(self._api+url, json=data)
         else:
@@ -69,7 +69,6 @@ class Sleepyq:
             else:
                 r = self._session.get(self._api+url)
         if r.status_code != 200: # If status code is not 200 OK
-            # Raise error
             r.raise_for_status()
         return r
 
@@ -84,12 +83,12 @@ class Sleepyq:
         return True
 
     def sleepers(self):
-        r=self.__makeRequest('/sleeper')
+        r=self.__make_request('/sleeper')
         sleepers = [Sleeper(sleeper) for sleeper in r.json()['sleepers']]
         return sleepers
 
     def beds(self):
-        r=self.__makeRequest('/bed')
+        r=self.__make_request('/bed')
         beds = [Bed(bed) for bed in r.json()['beds']]
         return beds
 
@@ -114,7 +113,7 @@ class Sleepyq:
 
 
     def bed_family_status(self):
-        r=self.__makeRequest('/bed/familyStatus')
+        r=self.__make_request('/bed/familyStatus')
         statuses = [FamilyStatus(status) for status in r.json()['beds']]
         return statuses
 
@@ -129,7 +128,7 @@ class Sleepyq:
         #
         if 1 <= light <= 4:
             data = {'outletId': light, 'setting': 1 if setting else 0}
-            r=self.__makeRequest('/bed/'+bedId+'/foundation/outlet', "put", data)
+            r=self.__make_request('/bed/'+bedId+'/foundation/outlet', "put", data)
             return True
         else:
             raise ValueError("Invalid light")
@@ -140,7 +139,7 @@ class Sleepyq:
         #
         if 1 <= light <= 4:
             self._session.params['outletId'] = light
-            r=self.__makeRequest('/bed/'+bedId+'/foundation/outlet')
+            r=self.__make_request('/bed/'+bedId+'/foundation/outlet')
             del self._session.params['outletId']
             light = Light(r.json())
             return light
@@ -167,7 +166,7 @@ class Sleepyq:
             raise ValueError("Side mut be one of the following: left, right, L or R")
         if 1 <= preset <= 6:
             data = {'preset':preset,'side':side,'speed':1 if speed else 0}
-            r=self.__makeRequest('/bed/'+bedId+'/foundation/preset', "put", data)
+            r=self.__make_request('/bed/'+bedId+'/foundation/preset', "put", data)
             return True
         else:
             raise ValueError("Invalid preset")
@@ -187,7 +186,7 @@ class Sleepyq:
             raise ValueError("Side mut be one of the following: left, right, L or R")
         data = {'bed': bedId, 'side': side, "sleepNumber": int(round(setting/5))*5}
         self._session.params['side']=side
-        r=self.__makeRequest('/bed/'+bedId+'/sleepNumber', "put", data)
+        r=self.__make_request('/bed/'+bedId+'/sleepNumber', "put", data)
         del self._session.params['side']
         return True
 
@@ -205,15 +204,15 @@ class Sleepyq:
         else:
             raise ValueError("Side mut be one of the following: left, right, L or R")
         data = {'side': side, "sleepNumberFavorite": int(round(setting/5))*5}
-        r=self.__makeRequest('/bed/'+bedId+'/sleepNumberFavorite', "put", data)
+        r=self.__make_request('/bed/'+bedId+'/sleepNumberFavorite', "put", data)
         return True
 
     def get_favsleepnumber(self, bedId):
-        r=self.__makeRequest('/bed/'+bedId+'/sleepNumberFavorite')
+        r=self.__make_request('/bed/'+bedId+'/sleepNumberFavorite')
         favsleepnumber = FavSleepNumber(r.json())
         return favsleepnumber
 
-    def stopmotion(self, bedId, side):
+    def stop_motion(self, bedId, side):
         #
         # side "R" or "L"
         #
@@ -224,9 +223,9 @@ class Sleepyq:
         else:
             raise ValueError("Side mut be one of the following: left, right, L or R")
         data = {"footMotion":1, "headMotion":1, "massageMotion":1, "side":side}
-        r=self.__makeRequest('/bed/'+bedId+'/foundation/motion', "put", data)
+        r=self.__make_request('/bed/'+bedId+'/foundation/motion', "put", data)
         return True
 
-    def stoppump(self, bedId):
-        r=self.__makeRequest('/bed/'+bedId+'/pump/forceIdle', "put")
+    def stop_pump(self, bedId):
+        r=self.__make_request('/bed/'+bedId+'/pump/forceIdle', "put")
         return True
