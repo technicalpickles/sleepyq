@@ -79,7 +79,7 @@ class Sleepyq:
         data = {'login': self._login, 'password': self._password}
         r = self._session.put(self._api+'/login', json=data)
         if r.status_code == 401:
-            return False
+            raise ValueError("Incorect username or password")
         self._session.params['_k'] = r.json()['key']
         return True
 
@@ -104,7 +104,7 @@ class Sleepyq:
             for side in ['left', 'right']:
                 sleeper_key = 'sleeper_' + side + '_id'
                 sleeper_id = getattr(bed, sleeper_key)
-                if sleeper_id == "0":
+                if sleeper_id == "0": # if no sleeper
                     continue
                 sleeper = sleepers_by_id[sleeper_id]
                 status = getattr(family_status, side)
@@ -125,14 +125,14 @@ class Sleepyq:
         ### 2=Left Night Stand
         ### 3=Right Night Light
         ### 4=Left Night Light
-        # setting 0=off, 1=on
+        # setting False=off, True=on
         #
-        if 1 <= light <= 4 and setting in (0, 1):
-            data = {'outletId': light, 'setting': setting}
+        if 1 <= light <= 4:
+            data = {'outletId': light, 'setting': 1 if setting else 0}
             r=self.__makeRequest('/bed/'+bedId+'/foundation/outlet', "put", data)
             return True
         else:
-            return False
+            raise ValueError("Invalid light")
 
     def get_light(self, bedId, light):
         #
@@ -145,7 +145,7 @@ class Sleepyq:
             light = Light(r.json())
             return light
         else:
-            return False
+            raise ValueError("Invalid light")
 
     def preset(self, bedId, preset, side, speed):
         #
@@ -164,28 +164,28 @@ class Sleepyq:
         elif side.lower() in ('l', 'left'):
             side = "L"
         else:
-            return False
-        if 1 <= preset <= 6 and speed in (0, 1):
-            data = {'preset':preset,'side':side,'speed':speed}
+            raise ValueError("Side mut be one of the following: left, right, L or R")
+        if 1 <= preset <= 6:
+            data = {'preset':preset,'side':side,'speed':1 if speed else 0}
             r=self.__makeRequest('/bed/'+bedId+'/foundation/preset', "put", data)
             return True
         else:
-            return False
+            raise ValueError("Invalid preset")
 
     def set_sleepnumber(self, bedId, side, setting):
         #
         # side "R" or "L"
-        # setting 0-100 (increments of 5)
+        # setting 0-100 (rounds to nearest multiple of 5)
         #
-        if setting%5 != 0:
-            return False
+        if 0 > setting or setting > 100 :
+            raise ValueError("Invalid SleepNumber, must be between 0 and 100")
         if side.lower() in ('r', 'right'):
             side = "R"
         elif side.lower() in ('l', 'left'):
             side = "L"
         else:
-            return False
-        data = {'bed': bedId, 'side': side, "sleepNumber":setting}
+            raise ValueError("Side mut be one of the following: left, right, L or R")
+        data = {'bed': bedId, 'side': side, "sleepNumber": int(round(setting/5))*5}
         self._session.params['side']=side
         r=self.__makeRequest('/bed/'+bedId+'/sleepNumber', "put", data)
         del self._session.params['side']
@@ -194,17 +194,17 @@ class Sleepyq:
     def set_favsleepnumber(self, bedId, side, setting):
         #
         # side "R" or "L"
-        # setting 0-100 (increments of 5)
+        # setting 0-100 (rounds to nearest multiple of 5)
         #
-        if setting%5 != 0:
-            return False
+        if 0 > setting or setting > 100:
+            raise ValueError("Invalid SleepNumber, must be between 0 and 100")
         if side.lower() in ('r', 'right'):
             side = "R"
         elif side.lower() in ('l', 'left'):
             side = "L"
         else:
-            return False
-        data = {'side': side, "sleepNumberFavorite":setting}
+            raise ValueError("Side mut be one of the following: left, right, L or R")
+        data = {'side': side, "sleepNumberFavorite": int(round(setting/5))*5}
         r=self.__makeRequest('/bed/'+bedId+'/sleepNumberFavorite', "put", data)
         return True
 
@@ -222,7 +222,7 @@ class Sleepyq:
         elif side.lower() in ('l', 'left'):
             side = "L"
         else:
-            return False
+            raise ValueError("Side mut be one of the following: left, right, L or R")
         data = {"footMotion":1, "headMotion":1, "massageMotion":1, "side":side}
         r=self.__makeRequest('/bed/'+bedId+'/foundation/motion', "put", data)
         return True
