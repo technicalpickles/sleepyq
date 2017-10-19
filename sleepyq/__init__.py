@@ -3,6 +3,19 @@ import inflection
 
 from collections import namedtuple
 
+RIGHT_NIGHT_STAND = 1
+LEFT_NIGHT_STAND = 2
+RIGHT_NIGHT_LIGHT = 3
+LEFT_NIGHT_LIGHT = 4
+
+FAVORITE = 1
+READ = 2
+WATCH_TV = 3
+FLAT = 4
+ZERO_G = 5
+SNORE = 6
+
+
 class APIobject(object):
     def __init__(self, data):
         self.data = data
@@ -40,7 +53,7 @@ class Light(APIobject):
     def __init__(self, data):
         super(Light, self).__init__(data)
         self.bed = None
-
+ 
 class FavSleepNumber(APIobject):
     def __init__(self, data):
         super(FavSleepNumber, self).__init__(data)
@@ -55,22 +68,21 @@ class Sleepyq:
         self._session = requests.Session()
         self._api = "https://api.sleepiq.sleepnumber.com/rest"
 
-    def __make_request(self, url, mode="get", data=""):
-        if mode == 'put':
-            r = self._session.put(self._api+url, json=data)
-        else:
-            r = self._session.get(self._api+url)
-        if r.status_code == 401: # HTTP error 401 Unauthorized
-            # Login
-            self.login()
-            # Retry Request
+    def __make_request(self, url, mode="get", data="", attempt=0):
+        if attempt < 2:
             if mode == 'put':
                 r = self._session.put(self._api+url, json=data)
             else:
                 r = self._session.get(self._api+url)
-        if r.status_code != 200: # If status code is not 200 OK
-            r.raise_for_status()
-        return r
+            if r.status_code == 401: # HTTP error 401 Unauthorized
+                # Login
+                self.login()
+            if r.status_code != 200: # If status code is not 200 OK
+                retry = self.__make_request(url, mode, data, attempt+1)
+                if type(retry) == requests.models.Response:
+                    r = retry
+                r.raise_for_status()
+            return r
 
     def login(self):
         if '_k' in self._session.params:
@@ -120,10 +132,6 @@ class Sleepyq:
     def set_light(self, bedId, light, setting):
         #
         # light 1-4
-        ### 1=Right Night Stand
-        ### 2=Left Night Stand
-        ### 3=Right Night Light
-        ### 4=Left Night Light
         # setting False=off, True=on
         #
         if 1 <= light <= 4:
@@ -149,14 +157,8 @@ class Sleepyq:
     def preset(self, bedId, preset, side, speed):
         #
         # preset 1-6
-        ### 1=fav?
-        ### 2=read
-        ### 3=watch tv
-        ### 4=flat
-        ### 5=zero g
-        ### 6=snore
         # side "R" or "L"
-        # Speed 0=fast, 1=slow
+        # Speed False=fast, True=slow
         #
         if side.lower() in ('r', 'right'):
             side = "R"
@@ -228,4 +230,4 @@ class Sleepyq:
 
     def stop_pump(self, bedId):
         r=self.__make_request('/bed/'+bedId+'/pump/forceIdle', "put")
-        return True
+        #return True
