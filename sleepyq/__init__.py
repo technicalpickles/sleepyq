@@ -84,14 +84,12 @@ class Sleepyq:
         return True
 
     def sleepers(self):
-        url = '/sleeper'
-        r=self.__makeRequest(url)
+        r=self.__makeRequest('/sleeper')
         sleepers = [Sleeper(sleeper) for sleeper in r.json()['sleepers']]
         return sleepers
 
     def beds(self):
-        url = '/bed'
-        r=self.__makeRequest(url)
+        r=self.__makeRequest('/bed')
         beds = [Bed(bed) for bed in r.json()['beds']]
         return beds
 
@@ -116,8 +114,7 @@ class Sleepyq:
 
 
     def bed_family_status(self):
-        url = '/bed/familyStatus'
-        r=self.__makeRequest(url)
+        r=self.__makeRequest('/bed/familyStatus')
         statuses = [FamilyStatus(status) for status in r.json()['beds']]
         return statuses
 
@@ -131,9 +128,8 @@ class Sleepyq:
         # setting 0=off, 1=on
         #
         if 1 <= light <= 4 and setting in (0, 1):
-            url = '/bed/'+bedId+'/foundation/outlet'
             data = {'outletId': light, 'setting': setting}
-            r=self.__makeRequest(url, "put", data)
+            r=self.__makeRequest('/bed/'+bedId+'/foundation/outlet', "put", data)
             return True
         else:
             return False
@@ -143,9 +139,8 @@ class Sleepyq:
         # same light numbering as set_light
         #
         if 1 <= light <= 4:
-            url = '/bed/'+bedId+'/foundation/outlet'
             self._session.params['outletId'] = light
-            r=self.__makeRequest(url)
+            r=self.__makeRequest('/bed/'+bedId+'/foundation/outlet')
             del self._session.params['outletId']
             light = Light(r.json())
             return light
@@ -171,9 +166,8 @@ class Sleepyq:
         else:
             return False
         if 1 <= preset <= 6 and speed in (0, 1):
-            url = '/bed/'+bedId+'/foundation/preset'
             data = {'preset':preset,'side':side,'speed':speed}
-            r=self.__makeRequest(url, "put", data)
+            r=self.__makeRequest('/bed/'+bedId+'/foundation/preset', "put", data)
             return True
         else:
             return False
@@ -191,10 +185,9 @@ class Sleepyq:
             side = "L"
         else:
             return False
-        url = '/bed/'+bedId+'/sleepNumber'
         data = {'bed': bedId, 'side': side, "sleepNumber":setting}
         self._session.params['side']=side
-        r=self.__makeRequest(url, "put", data)
+        r=self.__makeRequest('/bed/'+bedId+'/sleepNumber', "put", data)
         del self._session.params['side']
         return True
 
@@ -211,14 +204,12 @@ class Sleepyq:
             side = "L"
         else:
             return False
-        url = '/bed/'+bedId+'/sleepNumberFavorite'
         data = {'side': side, "sleepNumberFavorite":setting}
-        r=self.__makeRequest(url, "put", data)
+        r=self.__makeRequest('/bed/'+bedId+'/sleepNumberFavorite', "put", data)
         return True
 
     def get_favsleepnumber(self, bedId):
-        url = '/bed/'+bedId+'/sleepNumberFavorite'
-        r=self.__makeRequest(url)
+        r=self.__makeRequest('/bed/'+bedId+'/sleepNumberFavorite')
         favsleepnumber = FavSleepNumber(r.json())
         return favsleepnumber
 
@@ -232,12 +223,10 @@ class Sleepyq:
             side = "L"
         else:
             return False
-        url = '/bed/'+bedId+'/foundation/motion'
         data = {"footMotion":1, "headMotion":1, "massageMotion":1, "side":side}
-        r=self.__makeRequest(url, "put", data)
+        r=self.__makeRequest('/bed/'+bedId+'/foundation/motion', "put", data)
         return True
 
     def stoppump(self, bedId):
-        url = '/bed/'+bedId+'/pump/forceIdle'
-        r=self.__makeRequest(url, "put")
+        r=self.__makeRequest('/bed/'+bedId+'/pump/forceIdle', "put")
         return True
