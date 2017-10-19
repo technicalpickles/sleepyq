@@ -230,4 +230,4 @@ class Sleepyq:
 
     def stop_pump(self, bedId):
         r=self.__make_request('/bed/'+bedId+'/pump/forceIdle', "put")
-        #return True
+        return True
