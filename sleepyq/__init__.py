@@ -49,17 +49,16 @@ class Sleeper(APIobject):
         super(Sleeper, self).__init__(data)
         self.bed = None
 
-class Light(APIobject):
-    def __init__(self, data):
-        super(Light, self).__init__(data)
-        self.bed = None
- 
 class FavSleepNumber(APIobject):
     def __init__(self, data):
         super(FavSleepNumber, self).__init__(data)
-        self.bed = None
         self.left = None
         self.right = None
+
+class Status(APIobject):
+    def __init__(self, data):
+        super(Status, self).__init__(data)
+
 
 class Sleepyq:
     def __init__(self, login, password):
@@ -149,8 +148,7 @@ class Sleepyq:
             self._session.params['outletId'] = light
             r=self.__make_request('/bed/'+bedId+'/foundation/outlet')
             del self._session.params['outletId']
-            light = Light(r.json())
-            return light
+            return Status(r.json())
         else:
             raise ValueError("Invalid light")
 
@@ -211,8 +209,12 @@ class Sleepyq:
 
     def get_favsleepnumber(self, bedId):
         r=self.__make_request('/bed/'+bedId+'/sleepNumberFavorite')
-        favsleepnumber = FavSleepNumber(r.json())
-        return favsleepnumber
+        fav_sleepnumber = FavSleepNumber(r.json())
+        for side in ['Left', 'Right']:
+            side_key = 'sleepNumberFavorite'+ side
+            fav_sleepnumber_side = fav_sleepnumber.data[side_key]
+            setattr(fav_sleepnumber, side.lower(), fav_sleepnumber_side)
+        return fav_sleepnumber
 
     def stop_motion(self, bedId, side):
         #
@@ -231,3 +233,9 @@ class Sleepyq:
     def stop_pump(self, bedId):
         r=self.__make_request('/bed/'+bedId+'/pump/forceIdle', "put")
         return True
+
+    def foundation_status(self, bedId):
+        r=self.__make_request('/bed/'+bedId+'/foundation/status')
+        return Status(r.json())
+
+
