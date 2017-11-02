@@ -22,8 +22,13 @@ To get started using the library, here's the full usage:
     >>> pprint(client.bed_family_status())
     >>> client.set_lights(bedNumber, lightNumber, setting)
     >>> pprint(client.get_lights(bedNumber, lightNumber))
-    >>> client.preset(bedNumber, preset, side, speed)
+    >>> client.preset(bedNumber, preset, side, slowSpeed=False)
     >>> client.set_sleepnumber(bedNumber, side, sleepnumber)
+    >>> client.set_favsleepnumber(bedNumber, side, sleepnumber)
+    >>> pprint(client.get_favsleepnumber(bedNumber))
+    >>> client.stop_motion(bedNumber, side)
+    >>> client.stop_pump(bedNumber)
+    >>> pprint(client.foundation_status(bedNumber))
 
 The API is undocumented, so this library does not make much attempt to structure the data from the API into objects.
 

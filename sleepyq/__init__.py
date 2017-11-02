@@ -8,6 +8,13 @@ LEFT_NIGHT_STAND = 2
 RIGHT_NIGHT_LIGHT = 3
 LEFT_NIGHT_LIGHT = 4
 
+BED_LIGHTS = [
+        RIGHT_NIGHT_STAND,
+        LEFT_NIGHT_STAND,
+        RIGHT_NIGHT_LIGHT,
+        LEFT_NIGHT_LIGHT
+    ]
+
 FAVORITE = 1
 READ = 2
 WATCH_TV = 3
@@ -15,6 +22,14 @@ FLAT = 4
 ZERO_G = 5
 SNORE = 6
 
+BED_PRESETS = [
+        FAVORITE,
+        READ,
+        WATCH_TV,
+        FLAT,
+        ZERO_G,
+        SNORE
+    ]
 
 class APIobject(object):
     def __init__(self, data):
@@ -133,7 +148,7 @@ class Sleepyq:
         # light 1-4
         # setting False=off, True=on
         #
-        if 1 <= light <= 4:
+        if light in BED_LIGHTS:
             data = {'outletId': light, 'setting': 1 if setting else 0}
             r=self.__make_request('/bed/'+bedId+'/foundation/outlet', "put", data)
             return True
@@ -144,7 +159,7 @@ class Sleepyq:
         #
         # same light numbering as set_light
         #
-        if 1 <= light <= 4:
+        if light in BED_LIGHTS:
             self._session.params['outletId'] = light
             r=self.__make_request('/bed/'+bedId+'/foundation/outlet')
             del self._session.params['outletId']
@@ -152,11 +167,11 @@ class Sleepyq:
         else:
             raise ValueError("Invalid light")
 
-    def preset(self, bedId, preset, side, speed):
+    def preset(self, bedId, preset, side, slowSpeed=False):
         #
         # preset 1-6
         # side "R" or "L"
-        # Speed False=fast, True=slow
+        # slowSpeed False=fast, True=slow
         #
         if side.lower() in ('r', 'right'):
             side = "R"
@@ -164,8 +179,8 @@ class Sleepyq:
             side = "L"
         else:
             raise ValueError("Side mut be one of the following: left, right, L or R")
-        if 1 <= preset <= 6:
-            data = {'preset':preset,'side':side,'speed':1 if speed else 0}
+        if preset in BED_PRESETS:
+            data = {'preset':preset,'side':side,'speed':1 if slowSpeed else 0}
             r=self.__make_request('/bed/'+bedId+'/foundation/preset', "put", data)
             return True
         else:
@@ -237,5 +252,4 @@ class Sleepyq:
     def foundation_status(self, bedId):
         r=self.__make_request('/bed/'+bedId+'/foundation/status')
         return Status(r.json())
-
 
