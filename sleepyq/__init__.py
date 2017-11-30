@@ -9,7 +9,7 @@ class APIobject(object):
 
     def __getattr__(self, name):
         adjusted_name = inflection.camelize(name, False)
-        return self.data[adjusted_name]
+        return self.data[adjusted_name] if self.data is not None else None
 
 class Bed(APIobject):
     def __init__(self, data):
@@ -83,7 +83,7 @@ class Sleepyq:
             for side in ['left', 'right']:
                 sleeper_key = 'sleeper_' + side + '_id'
                 sleeper_id = getattr(bed, sleeper_key)
-                sleeper = sleepers_by_id[sleeper_id]
+                sleeper = sleepers_by_id.get(sleeper_id)
 
                 status = getattr(family_status, side)
                 status.sleeper = sleeper
