@@ -80,15 +80,18 @@ class Sleepyq:
         self._login = login
         self._password = password
         self._session = requests.Session()
-        self._api = "https://api.sleepiq.sleepnumber.com/rest"
+        self._api = "https://prod-api.sleepiq.sleepnumber.com/rest"
 
     def __make_request(self, url, mode="get", data="", attempt=0):
-        if attempt < 2:
+        if attempt < 4:
             if mode == 'put':
                 r = self._session.put(self._api+url, json=data)
             else:
                 r = self._session.get(self._api+url)
             if r.status_code == 401: # HTTP error 401 Unauthorized
+                # Login
+                self.login()
+            elif r.status_code == 404: # HTTP error 404 Not Found
                 # Login
                 self.login()
             if r.status_code != 200: # If status code is not 200 OK
