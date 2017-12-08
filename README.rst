@@ -29,8 +29,8 @@ To get started using the library, here's the full usage:
     >>> client.stop_motion(bedNumber, side)
     >>> client.stop_pump(bedNumber)
     >>> pprint(client.foundation_status(bedNumber))
-    >>> pprint(foundation_system(bedNumber))
-    >>> pprint(foundation_features(bedNumber))
+    >>> pprint(client.foundation_system(bedNumber))
+    >>> pprint(client.foundation_features(bedNumber))
 
 The API is undocumented, so this library does not make much attempt to structure the data from the API into objects.
 
