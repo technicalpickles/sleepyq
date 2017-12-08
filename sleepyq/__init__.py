@@ -101,6 +101,9 @@ class Sleepyq:
                 r.raise_for_status()
             return r
 
+    def __feature_check(self, value, digit):
+        return ((1 << digit) & value) > 0
+
     def login(self):
         if '_k' in self._session.params:
             del self._session.params['_k']
@@ -256,3 +259,38 @@ class Sleepyq:
         r=self.__make_request('/bed/'+bedId+'/foundation/status')
         return Status(r.json())
 
+    def foundation_system(self, bedId):
+        r=self.__make_request('/bed/'+bedId+'/foundation/system')
+        return Status(r.json())
+
+    def foundation_features(self, bedId):
+        fs = self.foundation_system(bedId)
+        fs_board_features = getattr(fs, 'fsBoardFeatures')
+        fs_bed_type = getattr(fs, 'fsBedType')
+
+        feature = {}
+
+        feature['single'] = feature['split_head'] = feature['split_king'] = feature['eastern_king'] = False
+        if fs_bed_type == 0:
+            feature['single'] = True
+        elif fs_bed_type == 1:
+            feature['split_head'] = True
+        elif fs_bed_type == 2:
+            feature['split_king'] = True
+        elif fs_bed_type == 3:
+            feature['eastern_king'] = True
+
+        feature['BoardIsASingle'] = self.__feature_check(fs_board_features, 0)
+        feature['HasMassageAndLight'] = self.__feature_check(fs_board_features, 1)
+        feature['HasFootControl'] = self.__feature_check(fs_board_features, 2)
+        feature['HasFootWarming'] = self.__feature_check(fs_board_features, 3)
+        feature['HasUnderbedLight'] = self.__feature_check(fs_board_features, 4)
+        feature['LeftUnderbedLightPMW'] = getattr(fs, 'fsLeftUnderbedLightPWM')
+        feature['RightUnderbedLightPMW'] = getattr(fs, 'fsRightUnderbedLightPWM')
+
+        if feature['HasMassageAndLight']:
+            feature['HasUnderbedLight'] = True
+        if feature['split_king'] or feature['split_head']:
+            feature['BoardIsASingle'] = False
+
+    return Status(feature)
