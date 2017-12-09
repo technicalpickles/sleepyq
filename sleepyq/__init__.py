@@ -293,4 +293,4 @@ class Sleepyq:
         if feature['split_king'] or feature['split_head']:
             feature['BoardIsASingle'] = False
 
-    return Status(feature)
+        return Status(feature)
