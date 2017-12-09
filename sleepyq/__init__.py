@@ -270,27 +270,27 @@ class Sleepyq:
 
         feature = {}
 
-        feature['single'] = feature['split_head'] = feature['split_king'] = feature['eastern_king'] = False
+        feature['single'] = feature['splitHead'] = feature['splitKing'] = feature['easternKing'] = False
         if fs_bed_type == 0:
             feature['single'] = True
         elif fs_bed_type == 1:
-            feature['split_head'] = True
+            feature['splitHead'] = True
         elif fs_bed_type == 2:
-            feature['split_king'] = True
+            feature['splitKing'] = True
         elif fs_bed_type == 3:
-            feature['eastern_king'] = True
+            feature['easternKing'] = True
 
-        feature['BoardIsASingle'] = self.__feature_check(fs_board_features, 0)
-        feature['HasMassageAndLight'] = self.__feature_check(fs_board_features, 1)
-        feature['HasFootControl'] = self.__feature_check(fs_board_features, 2)
-        feature['HasFootWarming'] = self.__feature_check(fs_board_features, 3)
-        feature['HasUnderbedLight'] = self.__feature_check(fs_board_features, 4)
-        feature['LeftUnderbedLightPMW'] = getattr(fs, 'fsLeftUnderbedLightPWM')
-        feature['RightUnderbedLightPMW'] = getattr(fs, 'fsRightUnderbedLightPWM')
+        feature['boardIsASingle'] = self.__feature_check(fs_board_features, 0)
+        feature['hasMassageAndLight'] = self.__feature_check(fs_board_features, 1)
+        feature['hasFootControl'] = self.__feature_check(fs_board_features, 2)
+        feature['hasFootWarming'] = self.__feature_check(fs_board_features, 3)
+        feature['hasUnderbedLight'] = self.__feature_check(fs_board_features, 4)
+        feature['leftUnderbedLightPMW'] = getattr(fs, 'fsLeftUnderbedLightPWM')
+        feature['rightUnderbedLightPMW'] = getattr(fs, 'fsRightUnderbedLightPWM')
 
-        if feature['HasMassageAndLight']:
-            feature['HasUnderbedLight'] = True
-        if feature['split_king'] or feature['split_head']:
-            feature['BoardIsASingle'] = False
+        if feature['hasMassageAndLight']:
+            feature['hasUnderbedLight'] = True
+        if feature['splitKing'] or feature['splitHead']:
+            feature['boardIsASingle'] = False
 
         return Status(feature)
