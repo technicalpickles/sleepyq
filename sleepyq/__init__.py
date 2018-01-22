@@ -89,7 +89,7 @@ class Sleepyq:
                     r = self._session.put(self._api+url, json=data, timeout=2)
                 else:
                     r = self._session.get(self._api+url, timeout=2)
-               if r.status_code == 401: # HTTP error 401 Unauthorized
+                if r.status_code == 401: # HTTP error 401 Unauthorized
                     # Login
                     self.login()
                 elif r.status_code == 404: # HTTP error 404 Not Found
@@ -104,6 +104,10 @@ class Sleepyq:
                     r.raise_for_status()
                 return r
             except requests.exceptions.ReadTimeout:
+                retry = self.__make_request(url, mode, data, attempt+1)
+                if type(retry) == requests.models.Response:
+                    retry.raise_for_status()
+                    return retry
                 print('Request timed out to', url)
 
     def __feature_check(self, value, digit):
