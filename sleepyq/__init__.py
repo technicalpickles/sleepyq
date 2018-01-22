@@ -84,22 +84,27 @@ class Sleepyq:
 
     def __make_request(self, url, mode="get", data="", attempt=0):
         if attempt < 4:
-            if mode == 'put':
-                r = self._session.put(self._api+url, json=data)
-            else:
-                r = self._session.get(self._api+url)
-            if r.status_code == 401: # HTTP error 401 Unauthorized
-                # Login
-                self.login()
-            elif r.status_code == 404: # HTTP error 404 Not Found
-                # Login
-                self.login()
-            if r.status_code != 200: # If status code is not 200 OK
-                retry = self.__make_request(url, mode, data, attempt+1)
-                if type(retry) == requests.models.Response:
-                    r = retry
-                r.raise_for_status()
-            return r
+            try:
+                if mode == 'put':
+                    r = self._session.put(self._api+url, json=data, timeout=2)
+                else:
+                    r = self._session.get(self._api+url, timeout=2)
+               if r.status_code == 401: # HTTP error 401 Unauthorized
+                    # Login
+                    self.login()
+                elif r.status_code == 404: # HTTP error 404 Not Found
+                    # Login
+                    self.login()
+                elif r.status_code == 503:  # HTTP error 503 Server Error
+                    r.raise_for_status()
+                if r.status_code != 200: # If status code is not 200 OK
+                    retry = self.__make_request(url, mode, data, attempt+1)
+                    if type(retry) == requests.models.Response:
+                        r = retry
+                    r.raise_for_status()
+                return r
+            except requests.exceptions.ReadTimeout:
+                print('Request timed out to', url)
 
     def __feature_check(self, value, digit):
         return ((1 << digit) & value) > 0
@@ -107,6 +112,8 @@ class Sleepyq:
     def login(self):
         if '_k' in self._session.params:
             del self._session.params['_k']
+        if not self._login or not self._password:
+            raise ValueError("username/password not set")
         data = {'login': self._login, 'password': self._password}
         r = self._session.put(self._api+'/login', json=data)
         if r.status_code == 401:
