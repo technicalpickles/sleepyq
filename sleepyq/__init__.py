@@ -31,6 +31,29 @@ BED_PRESETS = [
         SNORE
     ]
 
+OFF = 0
+LOW = 1
+MEDIUM = 2
+HIGH = 3
+
+MASSAGE_SPEED = [
+        OFF,
+        LOW,
+        MEDIUM,
+        HIGH
+    ]
+
+SOOTHE = 1
+REVITILIZE = 2
+WAVE = 3
+
+MASSAGE_MODE = [
+        OFF,
+        SOOTHE,
+        REVITILIZE,
+        WAVE
+    ]
+
 class APIobject(object):
     def __init__(self, data):
         self.data = data
@@ -202,6 +225,51 @@ class Sleepyq:
             return True
         else:
             raise ValueError("Invalid preset")
+
+    def adjust_bed(self, bedId, actuator, position, side, slowSpeed=False):
+        #
+        # actuator  "H" or "F"
+        # position 0-100
+        # side "R" or "L"
+        # slowSpeed False=fast, True=slow
+        #
+        if 0 > position or position > 100 :
+            raise ValueError("Invalid position, must be between 0 and 100")
+        if side.lower() in ('r', 'right'):
+            side = "R"
+        elif side.lower() in ('l', 'left'):
+            side = "L"
+        else:
+            raise ValueError("Side mut be one of the following: left, right, L or R")
+        if actuator.lower() in ('h', 'head'):
+            actuator = "H"
+        elif actuator.lower() in ('f', 'foot'):
+            actuator = "F"
+        else:
+            raise ValueError("actuator mut be one of the following: head, foot, H or F")
+        data = {'actuator':actuator,'position':position,'side':side,'speed':1 if slowSpeed else 0}
+        r=self.__make_request('/bed/'+bedId+'/foundation/adjustment/micro', "put", data)
+        return True
+
+    def bed_massage(self, bedId, footSpeed, headSpeed, side, timer=0, mode=0):
+        #
+        # footSpeed 0-3
+        # headSpeed 0-3
+        # mode 0-3
+        # side "R" or "L"
+        #
+        if mode in MASSAGE_MODE:
+            if mode != 0:
+                footSpeed = 0
+                headSpeed = 0
+            if all(speed in MASSAGE_SPEED for speed in [footSpeed, headSpeed]):
+                data = {'footMassageMotor':footSpeed,'headMassageMotor':headSpeed,'massageTimer':timer,'massageWaveMode':mode,'side':side}
+                r=self.__make_request('/bed/'+bedId+'/foundation/adjustment', "put", data)
+                return True
+            else:
+                raise ValueError("Invalid head or foot speed")
+        else:
+            raise ValueError("Invalid mode")
 
     def set_sleepnumber(self, bedId, side, setting):
         #
