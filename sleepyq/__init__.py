@@ -142,13 +142,13 @@ class Sleepyq:
         sleepers_by_id = {sleeper.sleeper_id: sleeper for sleeper in sleepers}
         bed_family_statuses_by_bed_id = {family_status.bed_id: family_status for family_status in family_statuses}
         for bed in beds:
-            family_status = bed_family_statuses_by_bed_id[bed.bed_id]
+            family_status = bed_family_statuses_by_bed_id.get(bed.bed_id)
             for side in ['left', 'right']:
                 sleeper_key = 'sleeper_' + side + '_id'
                 sleeper_id = getattr(bed, sleeper_key)
                 if sleeper_id == "0": # if no sleeper
                     continue
-                sleeper = sleepers_by_id[sleeper_id]
+                sleeper = sleepers_by_id.get(sleeper_id)
                 status = getattr(family_status, side)
                 status.sleeper = sleeper
                 setattr(bed, side, status)
