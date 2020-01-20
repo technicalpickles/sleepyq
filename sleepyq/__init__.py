@@ -305,3 +305,28 @@ class Sleepyq:
             feature['boardIsASingle'] = False
 
         return Status(feature)
+        
+    def set_foundation_position(self, bedId, side, actuator, position, slowSpeed=False):
+        #
+        # side "R" or "L"
+        # actuator "H" or "F" (head or foot)
+        # position 0-100
+        # slowSpeed False=fast, True=slow
+        #
+        if 0 > position or position > 100:
+            raise ValueError("Invalid position, must be between 0 and 100")
+        if side.lower() in ('r', 'right'):
+            side = "R"
+        elif side.lower() in ('l', 'left'):
+            side = "L"
+        else:
+            raise ValueError("Side mut be one of the following: left, right, L or R")
+        if actuator.lower() in ('h', 'head'):
+            actuator = 'H'
+        elif actuator.lower() in ('f', 'foot'):
+            actuator = 'F'
+        else:
+            raise ValueError("Actuator must be one of the following: head, foot, h or f")
+        data = {'position':position,'side':side,'actuator':actuator,'speed':1 if slowSpeed else 0}
+        r=self.__make_request('/bed/'+bedId+'/foundation/adjustment/micro', "put", data)
+        return True
