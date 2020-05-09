@@ -175,7 +175,7 @@ class Sleepyq:
         #
         if light in BED_LIGHTS:
             data = {'outletId': light, 'setting': 1 if setting else 0}
-            r=self.__make_request('/bed/'+self.default_bed_id(self, bedId)+'/foundation/outlet', "put", data)
+            r=self.__make_request('/bed/'+self.default_bed_id(bedId)+'/foundation/outlet', "put", data)
             return True
         else:
             raise ValueError("Invalid light")
@@ -186,7 +186,7 @@ class Sleepyq:
         #
         if light in BED_LIGHTS:
             self._session.params['outletId'] = light
-            r=self.__make_request('/bed/'+self.default_bed_id(self, bedId)+'/foundation/outlet')
+            r=self.__make_request('/bed/'+self.default_bed_id(bedId)+'/foundation/outlet')
             del self._session.params['outletId']
             return Status(r.json())
         else:
@@ -206,13 +206,13 @@ class Sleepyq:
             raise ValueError("Side mut be one of the following: left, right, L or R")
         if preset in BED_PRESETS:
             data = {'preset':preset,'side':side,'speed':1 if slowSpeed else 0}
-            r=self.__make_request('/bed/'+self.default_bed_id(self, bedId)+'/foundation/preset', "put", data)
+            r=self.__make_request('/bed/'+self.default_bed_id(bedId)+'/foundation/preset', "put", data)
             return True
         else:
             raise ValueError("Invalid preset")
 
     def set_sleepnumber(self, side, setting, bedId = ''):
-        bedId = self.default_bed_id(self, bedId)
+        bedId = self.default_bed_id(bedId)
         #
         # side "R" or "L"
         # setting 0-100 (rounds to nearest multiple of 5)
@@ -245,11 +245,11 @@ class Sleepyq:
         else:
             raise ValueError("Side mut be one of the following: left, right, L or R")
         data = {'side': side, "sleepNumberFavorite": int(round(setting/5))*5}
-        r=self.__make_request('/bed/'+self.default_bed_id(self, bedId)+'/sleepNumberFavorite', "put", data)
+        r=self.__make_request('/bed/'+self.default_bed_id(bedId)+'/sleepNumberFavorite', "put", data)
         return True
 
     def get_favsleepnumber(self, bedId = ''):
-        r=self.__make_request('/bed/'+self.default_bed_id(self, bedId)+'/sleepNumberFavorite')
+        r=self.__make_request('/bed/'+self.default_bed_id(bedId)+'/sleepNumberFavorite')
         fav_sleepnumber = FavSleepNumber(r.json())
         for side in ['Left', 'Right']:
             side_key = 'sleepNumberFavorite'+ side
@@ -268,23 +268,23 @@ class Sleepyq:
         else:
             raise ValueError("Side mut be one of the following: left, right, L or R")
         data = {"footMotion":1, "headMotion":1, "massageMotion":1, "side":side}
-        r=self.__make_request('/bed/'+self.default_bed_id(self, bedId)+'/foundation/motion', "put", data)
+        r=self.__make_request('/bed/'+self.default_bed_id(bedId)+'/foundation/motion', "put", data)
         return True
 
     def stop_pump(self, bedId = ''):
-        r=self.__make_request('/bed/'+self.default_bed_id(self, bedId)+'/pump/forceIdle', "put")
+        r=self.__make_request('/bed/'+self.default_bed_id(bedId)+'/pump/forceIdle', "put")
         return True
 
     def foundation_status(self, bedId = ''):
-        r=self.__make_request('/bed/'+self.default_bed_id(self, bedId)+'/foundation/status')
+        r=self.__make_request('/bed/'+self.default_bed_id(bedId)+'/foundation/status')
         return Status(r.json())
 
     def foundation_system(self, bedId = ''):
-        r=self.__make_request('/bed/'+self.default_bed_id(self, bedId)+'/foundation/system')
+        r=self.__make_request('/bed/'+self.default_bed_id(bedId)+'/foundation/system')
         return Status(r.json())
 
     def foundation_features(self, bedId = ''):
-        fs = self.foundation_system(self.default_bed_id(self, bedId))
+        fs = self.foundation_system(self.default_bed_id(bedId))
         fs_board_features = getattr(fs, 'fsBoardFeatures')
         fs_bed_type = getattr(fs, 'fsBedType')
 
@@ -337,5 +337,5 @@ class Sleepyq:
         else:
             raise ValueError("Actuator must be one of the following: head, foot, h or f")
         data = {'position':position,'side':side,'actuator':actuator,'speed':1 if slowSpeed else 0}
-        r=self.__make_request('/bed/'+self.default_bed_id(self, bedId)+'/foundation/adjustment/micro', "put", data)
+        r=self.__make_request('/bed/'+self.default_bed_id(bedId)+'/foundation/adjustment/micro', "put", data)
         return True
