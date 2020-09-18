@@ -276,8 +276,12 @@ class Sleepyq:
         return True
 
     def foundation_status(self, bedId = ''):
-        r=self.__make_request('/bed/'+self.default_bed_id(bedId)+'/foundation/status')
-        return Status(r.json())
+        r = self.__make_request('/bed/'+self.default_bed_id(bedId)+'/foundation/status')
+        try:
+            result = Status(r.json())
+        except AttributeError:
+            result = None
+        return result
 
     def foundation_system(self, bedId = ''):
         r=self.__make_request('/bed/'+self.default_bed_id(bedId)+'/foundation/system')
