@@ -103,6 +103,7 @@ class Sleepyq:
         self._login = login
         self._password = password
         self._session = requests.Session()
+        self._session.headers.update({'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36'})
         self._api = "https://prod-api.sleepiq.sleepnumber.com/rest"
 
     def __make_request(self, url, mode="get", data="", attempt=0):
