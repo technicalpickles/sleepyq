@@ -5,7 +5,7 @@ def readme():
         return f.read()
 
 setup(name='sleepyq',
-      version='0.6',
+      version='0.7',
       description='SleepIQ API for Python',
       long_description=readme(),
       url='http://github.com/technicalpickles/sleepyq',
