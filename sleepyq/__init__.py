@@ -37,7 +37,7 @@ class APIobject(object):
 
     def __getattr__(self, name):
         adjusted_name = inflection.camelize(name, False)
-        return self.data[adjusted_name]
+        return self.data[adjusted_name] if self.data is not None else None
 
 class Bed(APIobject):
     def __init__(self, data):
