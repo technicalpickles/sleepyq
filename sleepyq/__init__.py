@@ -235,7 +235,7 @@ class Sleepyq:
         else:
             raise ValueError("Invalid preset")
 
-    def bed_massage(self, footSpeed, headSpeed, side, timer=0, mode=0, bedId = ''):
+    def set_bed_massage(self, footSpeed, headSpeed, side, timer=0, mode=0, bedId = ''):
         #
         # footSpeed 0-3
         # headSpeed 0-3
