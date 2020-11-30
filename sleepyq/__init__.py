@@ -1,7 +1,9 @@
 import requests
 import inflection
+import random
 
 from collections import namedtuple
+
 
 RIGHT_NIGHT_STAND = 1
 LEFT_NIGHT_STAND = 2
@@ -54,6 +56,29 @@ MASSAGE_MODE = [
         WAVE
     ]
 
+"""Return a randomly generated sorta valid User Agent string.
+
+   These values were generated in Nov-2020 and will expire in 1 year.
+"""
+class GenUserAgent(object):
+    uas = {"Edge": "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.67 Safari/537.36 Edg/87.0.664.47",
+           "Chrome": "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36",
+           "Firefox": "Gecko/20100101 Firefox/85.0",
+           "ipad": "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Mobile/15E148 Safari/604.1",
+           "Safari": "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.1.2 Safari/605.1.15",
+                }
+    os = {"windows": "Windows NT 10.0; Win64; x64; rv:85.0",
+          "ipad": "iPad; CPU OS 14_2 like Mac OS X",
+          "mac": "Macintosh; Intel Mac OS X 10_11_6",
+          }
+    template="Mozilla/5.0 ({os}) {ua}"
+
+    def ua(self):
+        return self.template.format(
+            os=random.choice(list(self.os.values())),
+            ua=random.choice(list(self.uas.values()))
+        )
+
 class APIobject(object):
     def __init__(self, data):
         self.data = data
@@ -103,7 +128,7 @@ class Sleepyq:
         self._login = login
         self._password = password
         self._session = requests.Session()
-        self._session.headers.update({'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36'})
+        self._session.headers.update({'User-Agent': GenUserAgent().ua()})
         self._api = "https://prod-api.sleepiq.sleepnumber.com/rest"
 
     def __make_request(self, url, mode="get", data="", attempt=0):
@@ -146,6 +171,13 @@ class Sleepyq:
         r = self._session.put(self._api+'/login', json=data)
         if r.status_code == 401:
             raise ValueError("Incorect username or password")
+        if r.status_code == 403:
+            raise ValueError("User Agent is blocked. May need to update GenUserAgent data?")
+        if r.status_code not in (200, 201):
+            raise ValueError("Unexpected response code: {code}\n{body}".format(
+                code=r.status_code,
+                body=r.text,
+            ))
         self._session.params['_k'] = r.json()['key']
         return True
 
@@ -183,7 +215,7 @@ class Sleepyq:
         r=self.__make_request('/bed/familyStatus')
         statuses = [FamilyStatus(status) for status in r.json()['beds']]
         return statuses
-        
+
     def default_bed_id(self, bedId):
         if not bedId:
             if len(self.beds()) == 1:
@@ -361,7 +393,7 @@ class Sleepyq:
             feature['boardIsASingle'] = False
 
         return Status(feature)
-        
+
     def set_foundation_position(self, side, actuator, position, bedId = '', slowSpeed=False):
         #
         # side "R" or "L"
