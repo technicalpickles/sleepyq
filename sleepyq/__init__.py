@@ -64,7 +64,7 @@ class GenUserAgent(object):
         "Edge": ("AppleWebKit/537.36 (KHTML, like Gecko) "
                  "Chrome/87.0.4280.67 Safari/537.36 Edg/87.0.664.47"),
         "Chrome": ("AppleWebKit/537.36 (KHTML, like Gecko) "
-                   "Chrome/86.0.4240.198 Safari/537.36"),
+                   "Chrome/87.0.4280.88 Safari/537.36"),
         "Firefox": "Gecko/20100101 Firefox/85.0",
         "ipad": ("AppleWebKit/605.1.15 (KHTML, like Gecko) "
                  "Version/14.0.1 Mobile/15E148 Safari/604.1"),
@@ -74,7 +74,12 @@ class GenUserAgent(object):
     os = {
         "windows": "Windows NT 10.0; Win64; x64; rv:85.0",
         "ipad": "iPad; CPU OS 14_2 like Mac OS X",
-        "mac": "Macintosh; Intel Mac OS X 10_11_6",
+        "mac_10": "Macintosh; Intel Mac OS X 10_11_6",
+        "mac_11": "Macintosh; Intel Mac OS X 11_0_1",
+        "linux": "X11; Linux x86_64",
+        "android_10": "Linux; Android 10",
+        "android_9": "Linux; Android 9"
+        "chrome_os": "X11; CrOS x86_64 13310.93.0",
     }
     template = "Mozilla/5.0 ({os}) {ua}"
 
