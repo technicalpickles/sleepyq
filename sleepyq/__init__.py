@@ -75,11 +75,8 @@ class GenUserAgent(object):
         "windows": "Windows NT 10.0; Win64; x64; rv:85.0",
         "ipad": "iPad; CPU OS 14_2 like Mac OS X",
         "mac_10": "Macintosh; Intel Mac OS X 10_11_6",
-        "mac_11": "Macintosh; Intel Mac OS X 11_0_1",
         "linux": "X11; Linux x86_64",
-        "android_10": "Linux; Android 10",
         "android_9": "Linux; Android 9",
-        "chrome_os": "X11; CrOS x86_64 13310.93.0",
     }
     template = "Mozilla/5.0 ({os}) {ua}"
 
