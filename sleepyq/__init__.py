@@ -78,7 +78,7 @@ class GenUserAgent(object):
         "mac_11": "Macintosh; Intel Mac OS X 11_0_1",
         "linux": "X11; Linux x86_64",
         "android_10": "Linux; Android 10",
-        "android_9": "Linux; Android 9"
+        "android_9": "Linux; Android 9",
         "chrome_os": "X11; CrOS x86_64 13310.93.0",
     }
     template = "Mozilla/5.0 ({os}) {ua}"
@@ -152,6 +152,9 @@ class Sleepyq:
                 if r.status_code == 401: # HTTP error 401 Unauthorized
                     # Login
                     self.login()
+                elif r.status_code == 403: # HTTP error 403 Forbidden
+                    # Change User Agent
+                    self._session.headers.update({'User-Agent': GenUserAgent().ua()})
                 elif r.status_code == 404: # HTTP error 404 Not Found
                     # Login
                     self.login()
@@ -183,7 +186,9 @@ class Sleepyq:
         if r.status_code == 401:
             raise ValueError("Incorect username or password")
         if r.status_code == 403:
-            raise ValueError("User Agent is blocked. May need to update GenUserAgent data?")
+            raise ValueError("User Agent \"{ua}\" is blocked. May need to update GenUserAgent data?".format(
+                ua=self._session.headers['User-Agent'],
+            ))
         if r.status_code not in (200, 201):
             raise ValueError("Unexpected response code: {code}\n{body}".format(
                 code=r.status_code,
