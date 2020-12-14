@@ -64,7 +64,7 @@ class GenUserAgent(object):
         "Edge": ("AppleWebKit/537.36 (KHTML, like Gecko) "
                  "Chrome/87.0.4280.67 Safari/537.36 Edg/87.0.664.47"),
         "Chrome": ("AppleWebKit/537.36 (KHTML, like Gecko) "
-                   "Chrome/86.0.4240.198 Safari/537.36"),
+                   "Chrome/87.0.4280.88 Safari/537.36"),
         "Firefox": "Gecko/20100101 Firefox/85.0",
         "ipad": ("AppleWebKit/605.1.15 (KHTML, like Gecko) "
                  "Version/14.0.1 Mobile/15E148 Safari/604.1"),
@@ -74,7 +74,9 @@ class GenUserAgent(object):
     os = {
         "windows": "Windows NT 10.0; Win64; x64; rv:85.0",
         "ipad": "iPad; CPU OS 14_2 like Mac OS X",
-        "mac": "Macintosh; Intel Mac OS X 10_11_6",
+        "mac_10": "Macintosh; Intel Mac OS X 10_11_6",
+        "linux": "X11; Linux x86_64",
+        "android_9": "Linux; Android 9",
     }
     template = "Mozilla/5.0 ({os}) {ua}"
 
@@ -147,6 +149,9 @@ class Sleepyq:
                 if r.status_code == 401: # HTTP error 401 Unauthorized
                     # Login
                     self.login()
+                elif r.status_code == 403: # HTTP error 403 Forbidden
+                    # Change User Agent
+                    self._session.headers.update({'User-Agent': GenUserAgent().ua()})
                 elif r.status_code == 404: # HTTP error 404 Not Found
                     # Login
                     self.login()
@@ -178,7 +183,9 @@ class Sleepyq:
         if r.status_code == 401:
             raise ValueError("Incorect username or password")
         if r.status_code == 403:
-            raise ValueError("User Agent is blocked. May need to update GenUserAgent data?")
+            raise ValueError("User Agent \"{ua}\" is blocked. May need to update GenUserAgent data?".format(
+                ua=self._session.headers['User-Agent'],
+            ))
         if r.status_code not in (200, 201):
             raise ValueError("Unexpected response code: {code}\n{body}".format(
                 code=r.status_code,
